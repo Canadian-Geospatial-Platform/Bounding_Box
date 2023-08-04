@@ -20,7 +20,7 @@ if __name__ == '__main__':
     filename = "catalogue_scrape.dbf"
     catalogue_scrape = folder + "//" + filename
     geojson_url = 'https://geocore.metadata.geo.ca/0005301b-624e-4000-8dad-a1a1ac6b46c2.geojson'
-    save_path = r"C:/TEMP/geology.geojson"
+    save_path = r"C:/TEMP/0005301b-624e-4000-8dad-a1a1ac6b46c2.geojson"
     file_id = "0005301b-624e-4000-8dad-a1a1ac6b46c2.geojson"
 
     # now download the geojson file and save it to the TEMP directory
@@ -72,9 +72,9 @@ if __name__ == '__main__':
 
     # add fields that are needed to the attribute table
     #
-    arcpy.AddField_management(catalogue_scrape, "FILENAME", "TEXT", field_length=50)
+    arcpy.AddField_management(catalogue_scrape, "FILENAME", "TEXT", field_length=100)
     print "FILENAME field added to catalogue_scrape.dbf"
-    arcpy.AddField_management(catalogue_scrape, "FILEID", "TEXT", field_length=50)
+    arcpy.AddField_management(catalogue_scrape, "FILEID", "TEXT", field_length=100)
     print "FILEID field added to catalogue_scrape.dbf"
     arcpy.AddField_management(catalogue_scrape, "URL", "TEXT", field_length=256)
     print "URL field added to catalogue_scrape.dbf"
@@ -130,7 +130,6 @@ if __name__ == '__main__':
     del rows
 
     feature = 0
-
     while feature < options_count:
 
         rows = arcpy.UpdateCursor("c:\TEMP\catalogue_scrape.dbf")
@@ -150,7 +149,22 @@ if __name__ == '__main__':
                 print "inside if statement"
                 print feature
                 url = gj['features'][0]['properties']['options'][int(feature)]['url']
+                protocol = gj['features'][0]['properties']['options'][int(feature)]['protocol']
+                name_en = gj['features'][0]['properties']['options'][int(feature)]['name']['en']
+                name_fr = gj['features'][0]['properties']['options'][int(feature)]['name']['fr']
+                name = name_en + name_fr
+                description_en = gj['features'][0]['properties']['options'][int(feature)]['description']['en']
+                description_fr = gj['features'][0]['properties']['options'][int(feature)]['description']['fr']
+                description = description_en + description_fr
+                row.setValue("NAME", name)
+                row.setValue("NAME_EN", name_en)
+                row.setValue("NAME_FR", name_fr)
+                row.setValue("DESC_", description)
+                row.setValue("DESC_EN", description_en)
+                row.setValue("DESC_FR", description_fr)
+                row.setValue("PROTOCOL", protocol)
                 row.setValue("URL", url)
+                row.setValue("ROWID_", feature)
                 rows.updateRow(row)
                 print "url = " + str(url)
             feature = feature + 1
