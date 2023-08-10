@@ -3,6 +3,7 @@ import json
 import arcpy
 import urllib2
 from contextlib import closing
+import dbf
 
 def main():
     pass
@@ -16,12 +17,15 @@ if __name__ == '__main__':
 
     # Variables:
     #
+    # to do: change hardcoded to variables
     folder = "C:/TEMP"
     filename = "catalogue_scrape.dbf"
     catalogue_scrape = folder + "//" + filename
-    geojson_url = 'https://geocore.metadata.geo.ca/0005301b-624e-4000-8dad-a1a1ac6b46c2.geojson'
-    save_path = r"C:/TEMP/0005301b-624e-4000-8dad-a1a1ac6b46c2.geojson"
-    file_id = "0005301b-624e-4000-8dad-a1a1ac6b46c2.geojson"
+    filename_geocore = "000183ed-8864-42f0-ae43-c4313a860720.geojson"
+    geojson_url = 'https://geocore.metadata.geo.ca/' + str(filename_geocore)
+    save_path = "C:/TEMP/{}".format(filename_geocore)
+    file_id = str(filename_geocore)
+    #cgp_encoding = ""
 
     # now download the geojson file and save it to the TEMP directory
     #
@@ -42,8 +46,9 @@ if __name__ == '__main__':
     print "URL count for all options = " + str(url_count)
     protocol_count = options_count
     print "PROTOCOL count for all options = " + str(protocol_count)
-    name_count = len(item_dict['features'][0]['properties']['options'][0]['name'])
-    name_count = name_count * options_count
+    name_count = options_count
+    #name_count = len(item_dict['features'][0]['properties']['options'][0]['name'])
+    #name_count = name_count * options_count
     print "NAME count for all options = " + str(name_count)
     description_count = len(item_dict['features'][0]['properties']['options'][0]['description'])
     description_count = description_count * options_count
@@ -69,7 +74,7 @@ if __name__ == '__main__':
     #
     arcpy.CreateTable_management(folder, "catalogue_scrape.dbf")
     print("Table Created")
-
+    '''
     # add fields that are needed to the attribute table
     #
     arcpy.AddField_management(catalogue_scrape, "FILENAME", "TEXT", field_length=100)
@@ -94,10 +99,14 @@ if __name__ == '__main__':
     print "DESC-EN field added to catalogue_scrape.dbf"
     arcpy.AddField_management(catalogue_scrape, "ROWID", "TEXT", field_length=10)
     print "ROWIDS field added to catalogue_scrape.dbf"
+    '''
+
+    # Set DBF encoding from ASCII to UTF-8
+    #
+    dbf.Table('C:\TEMP\catalogue_scrape.dbf', 'FILENAME C(100); FILEID C(100); URL C(254); PROTOCOL C(100); NAME C(254); NAME_EN C(254); NAME_FR C(254); DESC_ C(254); DESC_EN C(254); DESC_FR C(254); ROWID_ C(10)', codepage=0xf0)
 
     # delete the automatically added Field1 attribute field
-    #
-    arcpy.DeleteField_management(catalogue_scrape, "Field1")
+    #arcpy.DeleteField_management(catalogue_scrape, "Field1")
 
     # Create insert cursor for table
     #
@@ -152,10 +161,12 @@ if __name__ == '__main__':
                 protocol = gj['features'][0]['properties']['options'][int(feature)]['protocol']
                 name_en = gj['features'][0]['properties']['options'][int(feature)]['name']['en']
                 name_fr = gj['features'][0]['properties']['options'][int(feature)]['name']['fr']
-                name = name_en + name_fr
+                name = unicode(gj['features'][0]['properties']['options'][int(feature)]['name']['en']) + unicode(gj['features'][0]['properties']['options'][int(feature)]['name']['fr'])
+                print name + " = name"
                 description_en = gj['features'][0]['properties']['options'][int(feature)]['description']['en']
                 description_fr = gj['features'][0]['properties']['options'][int(feature)]['description']['fr']
-                description = description_en + description_fr
+                description = unicode(description_en) + unicode(description_fr)
+                print description + " = description"
                 row.setValue("NAME", name)
                 row.setValue("NAME_EN", name_en)
                 row.setValue("NAME_FR", name_fr)
@@ -193,6 +204,7 @@ if __name__ == '__main__':
     print "Feature = " + str(feature)
     print "Options count = " + str(options_count)
 
+    '''
     while feature >= options_count and feature < name_count:
 
         row_number = 0
@@ -219,6 +231,7 @@ if __name__ == '__main__':
 
     del row
     del rows
+    '''
 
     print str(feature) + " = features for second round calculations"
     print str(row_number) + " = row number to start with for new calculations"
@@ -234,5 +247,4 @@ if __name__ == '__main__':
     print "There are " + str(name_count) + " names, one english and one french for each feature under options"
     print "There are " + str(description_count) + " descriptions, one english and one french for each feature under options"
     print "This means that there are " + str(name_count) + " lines to be added to the attribute table, and four lines to fill based on attributes on the line before them"
-
 
