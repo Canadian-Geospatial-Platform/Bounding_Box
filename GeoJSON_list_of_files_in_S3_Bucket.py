@@ -8,11 +8,11 @@
 import json
 import boto3
 
-GEOJSON_BUCKET_NAME=GEOJSON_BUCKET_NAME
+GEOJSON_BUCKET_NAME='webpresence-geocore-json-to-geojson-dev'
 
 def lambda_handler(event, context):
 
-    GEOJSON_BUCKET_NAME=GEOJSON_BUCKET_NAME
+    GEOJSON_BUCKET_NAME='webpresence-geocore-json-to-geojson-dev'
     
     s3_paginate_options = {'Bucket':GEOJSON_BUCKET_NAME}
 
@@ -56,8 +56,8 @@ def s3_filenames_paginated(region, **kwargs):
 if __name__ == '__main__':
     #main()
 
-    region = REGION
-    kwargs = {'Bucket':GEOJSON_BUCKET_NAME}
+    region = 'ca-central-1'
+    kwargs = {'Bucket':'webpresence-geocore-json-to-geojson-dev'}
 
     s3_bucket_filenames = s3_filenames_paginated(region, **kwargs)
     print(s3_bucket_filenames)
