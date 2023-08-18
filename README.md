@@ -4,7 +4,7 @@ In this script the GeoJSON available online through the catalogue (GeoCore forma
 Up-Table to be used to guide the next scripts through translating the new table into GeoJSON with new spatial coordinates
 representing the bounding boxes of the layers with better representation than 4 points.
 
-# GeoJSON list of files in s# bucket
+# GeoJSON list of files in s3 bucket
 1) Use your AWS credentials to log in to AWS.
 2) Paginate by 1000 through chosen directory (s3 bucket) and extract filenames as a list
 3) create a pythin list/dictionary to load filenames
