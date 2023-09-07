@@ -21,5 +21,6 @@ representing the bounding boxes of the layers with better representation than 4 
 2) List the amount of files/rows
 3) Transform the Pandas Data Frame into a CSV file
 
-
+# Parquet to Pandas Data Frame
+1)Open a S3 parquet file from bucket and filename and return the aprquet as pandas dataframe
 
