@@ -15,3 +15,11 @@ representing the bounding boxes of the layers with better representation than 4 
 3) Transfer Attributes: Moving attributes from GeoCore metadata to LUT.
 4) Complete - Transfer of metadata element complete, if yes and with no errors, repeat 1-3
 5) Log Errors - Transfer not complete, aborted due to errors.  Log errors, then repeat 1-3 
+
+# Export to CSV
+1) open a S3 file returning the body of the file
+2) List the amount of files/rows
+3) Transform the Pandas Data Frame into a CSV file
+
+
+
