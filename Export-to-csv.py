@@ -42,8 +42,9 @@ def open_S3_file_as_df(bucket_name, file_name):
     
 df = open_S3_file_as_df(bucket_name, file_name)
 print(f'The shape of the raw metadata parquet dataset is {df.shape}')
+print("DataFrame: " + str(df))
 
-
+"""
 # Add a new column to log the process, and loop through the pandas rows to assign values  
 df['process_log'] = ''
 
@@ -53,7 +54,7 @@ for index, row in df.iterrows():
         df.at[index, 'process_log'] = 'Success' # or 1 
     else:
         df.at[index, 'process_log'] = 'Fail' # or 0
-
+"""
 # Save all the records as a CSV to local path 
 save_path = os.path.join(os.getcwd(), 'records.csv')
 df.to_csv(save_path)
