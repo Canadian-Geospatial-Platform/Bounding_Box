@@ -22,5 +22,14 @@ representing the bounding boxes of the layers with better representation than 4 
 3) Transform the Pandas Data Frame into a CSV file
 
 # Parquet to Pandas Data Frame
-1)Open a S3 parquet file from bucket and filename and return the aprquet as pandas dataframe
+1) Open a S3 parquet file from bucket and filename and return the aprquet as pandas dataframe
+2) Output csv with changes, to be further cleaned
 
+# CSV cleaner
+1) clean all extraneous fields
+2) leave in csv format
+   
+# Table Clean Rows and Output
+1) Clean all rows that will not be used in this process and are extraneous
+2) Output as excel file or DBF, DBF prefered for interoperability
+3) Clean table to by exported to DynamoDB for next steps
