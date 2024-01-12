@@ -33,3 +33,11 @@ representing the bounding boxes of the layers with better representation than 4 
 1) Clean all rows that will not be used in this process and are extraneous
 2) Output as excel file or DBF, DBF prefered for interoperability
 3) Clean table to by exported to DynamoDB for next steps
+
+# List all Shapefiles in directory and all subdirectories within
+1) Set current working directory
+2) Create a list for file names to be appended to
+3) use os.walk to step through directories using topdown approach.
+4) while stepping through directories get files to list all files that end with .shp (shapefiles)
+5) append to list all shapefiles including path (so path + // + shp name)
+6) Print the list
