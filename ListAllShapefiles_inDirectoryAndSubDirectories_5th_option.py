@@ -32,3 +32,4 @@ if __name__ == "__main__":
             List_Files.append(root + "\\" + f)
         print ('--------------------------------')
 print List_Files
+print ('There are {} shapefiles in your list'.format(len(List_Files)))
