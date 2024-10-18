@@ -284,7 +284,7 @@ def lineTransform(FeatureClass):
 if __name__ == '__main__':
 
     completed = "completed"
-    error = "error"
+    error = "Error"
     Records_Clean_Table = r'C:\TEMP\Records_Clean.dbf'
     arcpy.AddField_management(
         in_table=Records_Clean_Table,
@@ -297,11 +297,11 @@ if __name__ == '__main__':
         field_is_nullable="NULLABLE",
         field_is_required="NON_REQUIRED",
         field_domain="")
-    Fields = ['FILE_ID', 'SCORE', 'URL_FINAL', 'FINAL']
+    Fields = ['FILE_ID', 'SCORE', 'URL_FINAL', 'FINAL', 'NOTES']
 
-    with arcpy.da.SearchCursor(Records_Clean_Table, Fields) as cursor:
+    with arcpy.da.UpdateCursor(Records_Clean_Table, Fields) as cursor:
         for row in cursor:
-            if row[1] == 4 and row[3] != "completed":
+            if row[1] == 4 and row[3] != "1":
                 FILE_ID = unicode(row[0])
                 SCORE = unicode(row[1])
                 URL = unicode(row[2])
@@ -310,7 +310,6 @@ if __name__ == '__main__':
                 print("SCORE = " + unicode(row[1]))
                 print("URL = " + unicode(row[2]))
                 print("FINAL = " + unicode(row[3]))
-                '''
                 try:
                     # Need to make the folder come from the ID
                     folder = "C:\\Temp\\" + str(FILE_ID)
@@ -365,7 +364,7 @@ if __name__ == '__main__':
                         else:
                             print('There are {} shapefiles in your folder'.format(len(files)))
                         for f in files:
-                            print root + "\\" + f
+                            print(root + "\\" + f)
                             List_SHP.append(root + "\\" + f)
                         #print ('--------------------------------')
                     # print List_SHP
@@ -549,17 +548,23 @@ if __name__ == '__main__':
                         include_m_values="NO_M_VALUES",
                         geoJSON="GEOJSON")
 
-                    print "---------------------"
-                    print "ESRI JSON created for " + str(FILE_ID)
-                    print "---------------------"
+                    print("---------------------")
+                    print("ESRI JSON created for " + str(FILE_ID))
+                    print("---------------------")
+                    row[3] = 1
+                    row[4] = 1
+                    cursor.updateRow(row)
 
                 except:
-                    print "---------------------"
-                    print "Error in longest loop for " + str(FILE_ID)
-                    print "---------------------"
+                    print("---------------------")
+                    print("Error in longest loop for " + str(FILE_ID))
+                    print("---------------------")
+                    row[3] = 1
+                    row[4] = 2
+                    cursor.updateRow(row)
                     pass
-                '''
-            elif row[1] == 3 and row[3] != "completed":
+
+            elif row[1] == 3 and row[3] != "1":
                 FILE_ID = unicode(row[0])
                 SCORE = unicode(row[1])
                 URL = unicode(row[2])
@@ -596,7 +601,7 @@ if __name__ == '__main__':
                     j = urllib2.urlopen(urlstring)
                     js = json.load(j)
                     maxrc = int(js["maxRecordCount"])
-                    print "Record extract limit: %s" % maxrc
+                    print("Record extract limit: %s" % maxrc)
 
                     # Get object ids of features
                     where = "1=1"
@@ -607,10 +612,10 @@ if __name__ == '__main__':
                     idlist = js["objectIds"]
                     idlist.sort()
                     numrec = len(idlist)
-                    print "Number of target records: %s" % numrec
+                    print("Number of target records: %s" % numrec)
 
                     # Gather features
-                    print "Gathering records..."
+                    print("Gathering records...")
                     fs = dict()
                     for i in range(0, numrec, maxrc):
                         torec = i + (maxrc - 1)
@@ -619,19 +624,19 @@ if __name__ == '__main__':
                         fromid = idlist[i]
                         toid = idlist[torec]
                         where = "{} >= {} and {} <= {}".format(idfield, fromid, idfield, toid)
-                        print "  {}".format(where)
+                        print("  {}".format(where))
                         urlstring = baseURL + "/query?where={}&returnGeometry=true&outFields={}&f=json".format(where,fields)
                         fs[i] = arcpy.FeatureSet()
                         fs[i].load(urlstring)
 
                     # Save features
-                    print "Saving features..."
+                    print("Saving features...")
                     fslist = []
                     for key,value in fs.items():
                         fslist.append(value)
 
                     arcpy.Merge_management(fslist, outdata)
-                    print "Done!"
+                    print("Done!")
 
                     arcpy.CreateFeatureclass_management(
                         out_path=folder,
@@ -654,7 +659,7 @@ if __name__ == '__main__':
                         # set feature class location and name
                         #
                         FeatureClass = gdb + "\\" + fc
-                        print "Feature class: " + FeatureClass
+                        print("Feature class: " + FeatureClass)
 
                         # Describe a feature class
                         #
@@ -664,7 +669,7 @@ if __name__ == '__main__':
                         #
                         type = desc.shapeType
 
-                        print str(type)
+                        print(str(type))
                         # If the type is polygon run through these instructions
                         #
                         if type == "Polygon":
@@ -705,7 +710,7 @@ if __name__ == '__main__':
                         field_is_required="NON_REQUIRED",
                         field_domain="")
 
-                    print "Field Added"
+                    print("Field Added")
 
                     # calculate the merge field to value 1
                     #
@@ -716,7 +721,7 @@ if __name__ == '__main__':
                         expression_type="PYTHON",
                         code_block="")
 
-                    print "Field Calculated"
+                    print("Field Calculated")
 
                     # dissolve the polygons based on the merge value of 1 creating one multipart
                     # polygon
@@ -729,53 +734,54 @@ if __name__ == '__main__':
                         multi_part="SINGLE_PART",
                         unsplit_lines="DISSOLVE_LINES")
 
-                    print "Features Dissolved to Single Part"
-                    '''
+                    print("Features Dissolved to Single Part")
+
                     # take the dissolved polygon and explode the single polygon into singlepart
                     # polygons
                     #
                     arcpy.MultipartToSinglepart_management(
                         in_features=ShapefileAll,
                         out_feature_class=singlepart)
-                    '''
-                    print "Multi part to single part explosion"
+
+                    print("Multi part to single part explosion")
 
                     # Add a field to count vertices "vertices"
                     #
-                    arcpy.AddField_management(
-                        in_table=singlepart,
-                        field_name="VERTICES",
-                        field_type="FLOAT",
-                        field_precision="255",
-                        field_scale="0",
-                        field_length="",
-                        field_alias="",
-                        field_is_nullable="NULLABLE",
-                        field_is_required="NON_REQUIRED",
-                        field_domain="")
+                    #arcpy.AddField_management(
+                    #    in_table=singlepart,
+                    #    field_name="VERTICES",
+                    #    field_type="FLOAT",
+                    #    field_precision="255",
+                    #    field_scale="0",
+                    #    field_length="",
+                    #    field_alias="",
+                    #    field_is_nullable="NULLABLE",
+                    #    field_is_required="NON_REQUIRED",
+                    #    field_domain="")
 
-                    print "Added field VERTICES"
+                    #print("Added field VERTICES")
 
                     # Calculate the vertices field with a count of vertices in that polygon
                     #
-                    arcpy.CalculateField_management(
-                        singlepart,
-                        "VERTICES",
-                        "!Shape!.pointCount-!Shape!.partCount",
-                        "PYTHON")
+                    #arcpy.CalculateField_management(
+                    #    singlepart,
+                    #    "VERTICES",
+                    #    "!Shape!.pointCount-!Shape!.partCount",
+                    #    "PYTHON")
 
-                    print "Calculate the amount of vertices in VERTICES field"
+                    #print("Calculate the amount of vertices in VERTICES field")
 
                     # print the count of all polygons found within the master shapefile
                     #
-                    PolygonCounter = 0
 
-                    with arcpy.da.SearchCursor(singlepart,"MERGE") as cursor:
-                        for row in cursor:
-                            PolygonCounter = PolygonCounter + 1
-                    print "There are " + str(PolygonCounter) + " polygons"
+                    #PolygonCounter = 0
 
-                    del row, cursor, PolygonCounter
+                    #with arcpy.da.SearchCursor(singlepart,"MERGE") as cursor:
+                    #    for row in cursor:
+                    #        PolygonCounter = PolygonCounter + 1
+                    #print("There are " + str(PolygonCounter) + " polygons")
+
+                    #del row, cursor, PolygonCounter
 
                     # create an ESRI GeoJSON for the master shapefile to be used to load into
                     # GeoCore
@@ -787,68 +793,74 @@ if __name__ == '__main__':
                         include_z_values="NO_Z_VALUES",
                         include_m_values="NO_M_VALUES",
                         geoJSON="GEOJSON")
-                    print "---------------------------"
-                    print "SUCCESS! ESRI JSON created"
-                    print "---------------------------"
+                    print("---------------------------")
+                    print("SUCCESS! ESRI JSON created")
+                    print("---------------------------")
+                    row[3] = 1
+                    row[4] = 1
+                    cursor.updateRow(row)
 
                 except:
-                    print "Failed"
-                    print "------------------------"
-                    print "ERROR in JSON creation"
-                    print "------------------------"
+                    print("Failed")
+                    print("------------------------")
+                    print("ERROR in JSON creation")
+                    print("------------------------")
+                    row[3] = 1
+                    row[4] = 2
+                    cursor.updateRow(row)
                     pass
 
-                try:
-                    arcpy.Delete_management(gdb)
-                    print "Delete gdb worked"
-                except:
-                    print "Delete gdb passed error, may not exist"
-                    pass
-
-                try:
-                    arcpy.Delete_management(ShapefileAll)
-                    print "Delete ShapefileAll worked"
-                except:
-                    print "Delete gdb passed error, may not exist"
-                    pass
-
-                try:
-                    arcpy.Delete_management(dissolve)
-                    print "Delete dissolve worked"
-                except:
-                    print "Delete dissolve passed error, may not exist"
-                    pass
-
-                try:
-                    arcpy.Delete_management(singlepart)
-                    print "Delete singlepart worked"
-                except:
-                    print "Delete singlepart passed error, may not exist"
-                    pass
             try:
-                arcpy.Delete_management(folder)
-                print "Delete folder worked"
+                arcpy.Delete_management(gdb)
+                #print "Delete gdb worked"
             except:
-                print "Delete Folder passed error, may not exist"
+                #print "Delete gdb passed error, may not exist"
+                pass
+
+            try:
+                arcpy.Delete_management(ShapefileAll)
+                #print "Delete ShapefileAll worked"
+            except:
+                #print "Delete gdb passed error, may not exist"
                 pass
 
             try:
                 arcpy.Delete_management(dissolve)
-                print "Delete dissolve worked"
+                #print "Delete dissolve worked"
             except:
-                print "Delete dissolve passed error, may not exist"
+                #print "Delete dissolve passed error, may not exist"
                 pass
 
             try:
                 arcpy.Delete_management(singlepart)
-                print "Delete singlepart worked"
+                #print "Delete singlepart worked"
             except:
-                print "Delete singlepart passed error, may not exist"
+                #print "Delete singlepart passed error, may not exist"
+                pass
+            try:
+                arcpy.Delete_management(folder)
+                #print "Delete folder worked"
+            except:
+                #print "Delete Folder passed error, may not exist"
+                pass
+
+            try:
+                arcpy.Delete_management(dissolve)
+                #print "Delete dissolve worked"
+            except:
+                #print "Delete dissolve passed error, may not exist"
+                pass
+
+            try:
+                arcpy.Delete_management(singlepart)
+                #print "Delete singlepart worked"
+            except:
+                #print "Delete singlepart passed error, may not exist"
                 pass
 
             try:
                 arcpy.Delete_management(save_path)
-                print "Delete save_path worked"
+                #print "Delete save_path worked"
             except:
-                print "Delete of save_path passed error, may not exist"
+                #print "Delete of save_path passed error, may not exist"
                 pass
